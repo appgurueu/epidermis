@@ -22,7 +22,9 @@ The only ~~outer skin~~ epidermis mod you'll ever need.
 
 All code written by [appgurueu](github.com/appgurueu/) and licensed under the MIT license.
 
-The following tool textures (within the `textures/tools` folder) have been created by Dragoni and are licensed under CC BY-SA 3.0:
+The textures have been created by Dragoni and appgurueu and are all licensed under CC BY-SA 3.0. Attribution is given below.
+
+The following tool textures (within the `textures/tools` folder) have been created by Dragoni:
 
 * `epidermis_book.png`
 * `epidermis_eraser.png`
@@ -33,7 +35,7 @@ The following tool textures (within the `textures/tools` folder) have been creat
 * `epidermis_pen_tip.png`
 * `epidermis_undo_redo.png`
 
-`logo.png` in the root folder was also created by Dragoni and is licensed under CC BY-SA 3.0 as well. Everything else was created by appgurueu and is also licensed under CC BY-SA 3.0.
+`logo.png` in the root folder was also created by Dragoni. Everything else was created by appgurueu and is also licensed under CC BY-SA 3.0. `screenshot.png` uses `character.png` by Jordach which is licensed under [CC BY-SA 3.0](https://github.com/minetest/minetest_game/tree/master/mods/player_api/README.txt) as well.
 
 ### Links
 
