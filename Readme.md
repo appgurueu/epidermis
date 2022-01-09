@@ -6,11 +6,23 @@ The only ~~outer skin~~ epidermis mod you'll ever need.
 
 ## About
 
-`epidermis` is a feature-fledged Minetest skin mod. Requires at least Minetest 5.4 for the server and at least 5.3 (dynamic media support) for the client. All code written by [appgurueu](github.com/appgurueu/) and licensed under the MIT license. Media by appgurueu and Dragoni as credited below, all licensed under CC BY-SA 3.0.
+`epidermis` is a feature-fledged Minetest skin mod, featuring 3d skin painting and excellent SkinDB support.
 
-## Credits
+### Requirements
 
-The following tool textures (within in the `textures/tools` folder) have been created by Dragoni and are licensed under CC BY-SA 3.0:
+`epidermis` requires at least Minetest 5.4 for the server and at least 5.3 (dynamic media support) for the client.
+
+#### Dependencies
+
+* [`modlib`](https://github.com/appgurueu/modlib)
+* [`moblib`](https://github.com/appgurueu/moblib)
+* [`player_api`](https://github.com/minetest/minetest_game/tree/master/mods/player_api)
+
+### Licensing
+
+All code written by [appgurueu](github.com/appgurueu/) and licensed under the MIT license.
+
+The following tool textures (within the `textures/tools` folder) have been created by Dragoni and are licensed under CC BY-SA 3.0:
 
 * `epidermis_book.png`
 * `epidermis_eraser.png`
@@ -21,7 +33,14 @@ The following tool textures (within in the `textures/tools` folder) have been cr
 * `epidermis_pen_tip.png`
 * `epidermis_undo_redo.png`
 
-`logo.png` in the root folder was also created by Dragoni and is licensed under CC BY-SA 3.0 as well. Everything else was created by appgurueu.
+`logo.png` in the root folder was also created by Dragoni and is licensed under CC BY-SA 3.0 as well. Everything else was created by appgurueu and is also licensed under CC BY-SA 3.0.
+
+### Links
+
+* [GitHub](https://github.com/appgurueu/epidermis) - sources, issue tracking, contributing
+* [Discord](https://discord.gg/ysP74by) - discussion, chatting
+* [Minetest Forum](https://forum.minetest.net/viewtopic.php?f=9&t=27670) - (more organized) discussion
+* [ContentDB](https://content.minetest.net/packages/LMD/epidermis/) - releases (downloading from GitHub is recommended)
 
 ## Features
 
