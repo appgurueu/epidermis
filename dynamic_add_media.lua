@@ -22,7 +22,7 @@ function epidermis.dynamic_add_media(path, on_all_received, ephemeral)
 	end
 	local arg = path
 	if minetest.features.dynamic_add_media_table then
-		arg = {path = path}
+		arg = {filepath = path}
 		if minetest.is_singleplayer() then
 			arg.ephemeral = true
 		else
