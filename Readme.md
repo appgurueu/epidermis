@@ -68,12 +68,11 @@ The following tool textures (within the `textures/tools` folder) have been creat
 
 ### Skin Mods
 
-* [NodeCore Skins](https://content.minetest.net/packages/Warr1024/nc_skins/): NodeCore-only, Multiplayer-focused mod providing a single fixed skin per player through the file system
 * [Wardrobe](https://content.minetest.net/packages/AntumDeluge/wardrobe_ad/) and [Wardrobe Outfits](https://content.minetest.net/packages/AntumDeluge/wardrobe_outfits/): A few "selected" skins; the former provides an API for other mods to register more
 * [Simple Skins](https://content.minetest.net/packages/TenPlus1/simple_skins/): A different set of available skins, excellent support for ancient MT versions
 * [SkinsDB](https://content.minetest.net/packages/bell07/skinsdb/) and [SkinsDB for Hades Revisited](https://content.minetest.net/packages/SFENCE/hades_skinsdb/): Proper SkinDB support using an update command which shuts down the server, support for user-added skins, decent skin selection dialog including a search feature
 
-Epidermis beats all currently available Skin Mods through better SkinDB support (including **uploading**) and is the first mod to provide 3-dimensional skin painting (which may however not be considered generally superior to 2-dimensional painting).
+Epidermis beats most currently available skin mods through better SkinDB support (including **uploading**) and is the first mod to provide 3-dimensional skin painting (which may however not be considered generally superior to 2-dimensional painting).
 
 ## Engine Limitations
 
@@ -163,6 +162,7 @@ Automatically sync with SkinDB at startup, continue syncing during game
 
 ## Possible future features
 
+- [ ] NodeCore support
 - [ ] 3D armor support
 - [ ] Restart server if a certain amount of dynamic texture data has been reached (100 MB?)
 - [ ] Paintable transportability (as items?) & trashability
