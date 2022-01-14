@@ -35,15 +35,22 @@ local used_textures = {}
 for _, filename in ipairs(minetest.get_dir_list(epidermis.paths.playerdata, false)) do
 	local playername = filename:match"^(.-)%.lua$"
 	if playername then
-		local filepath = concat_path{epidermis.paths.playerdata, filename}
-		if player_exists(playername) then
-			local playerdata = epidermis.get_player_data(playername)
-			used_textures[playerdata.epidermis] = true
-		else
-			assert(os.remove(filepath))
-		end
+		local playerdata = epidermis.get_player_data(playername)
+		used_textures[playerdata.epidermis] = true
 	end
 end
+
+-- HACK the auth handler returns nil at load time (see https://github.com/minetest/minetest/issues/11956)
+minetest.after(0, function()
+	for _, filename in ipairs(minetest.get_dir_list(epidermis.paths.playerdata, false)) do
+		local playername = filename:match"^(.-)%.lua$"
+		if playername and not player_exists(playername) then
+			local playerdata = epidermis.get_player_data(playername)
+			used_textures[playerdata.epidermis] = true
+			assert(os.remove(concat_path{epidermis.paths.playerdata, playername .. ".lua"}))
+		end
+	end
+end)
 
 -- Remove unused textures & store highest texture ID
 local epidermi_texture_path = epidermis.paths.dynamic_textures.epidermi
