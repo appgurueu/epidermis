@@ -34,7 +34,7 @@ function epidermis.dynamic_add_media(path, on_all_received, ephemeral)
 
 	if not next(to_receive) then
 		minetest.dynamic_add_media(arg, function(name)
-			minetest.log("warning", name .. " received media despite not being connected")
+			minetest.log("warning", ("%s received media %s despite not being connected"):format(name, filename))
 		end)
 		on_all_received()
 		return
@@ -45,7 +45,10 @@ function epidermis.dynamic_add_media(path, on_all_received, ephemeral)
 			on_all_received()
 			return
 		end
-		assert(to_receive[name])
+		if not to_receive[name] then
+			minetest.log("warning", ("%s received media %s despite not being connected"):format(name, filename))
+			return
+		end
 		to_receive[name] = nil
 		if not next(to_receive) then
 			on_all_received()
