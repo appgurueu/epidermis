@@ -55,30 +55,47 @@ end)
 -- Remove unused textures & store highest texture ID
 local epidermi_texture_path = epidermis.paths.dynamic_textures.epidermi
 for _, dirname in ipairs(minetest.get_dir_list(epidermi_texture_path, true)) do
+	local dir_path = concat_path{epidermi_texture_path, dirname}
 	local highest_number
 	local last_filename
+	local used = false
 	local function remove_if_unused(filename)
-		if not used_textures[filename] then
-			assert(os.remove(concat_path{epidermi_texture_path, dirname, filename}))
+		if used_textures[filename] then
+			used = true
+		else
+			assert(os.remove(concat_path{dir_path, filename}))
 		end
 	end
-	for _, filename in ipairs(minetest.get_dir_list(concat_path{epidermi_texture_path, dirname}, false)) do
-		local number = filename:match("^" .. modlib.text.escape_magic_chars(dirname) .. "_(%d+)%.png$")
-		if number then
-			number = tonumber(number)
-			if last_filename then
-				if number > highest_number then
-					remove_if_unused(last_filename)
+	local filenames = minetest.get_dir_list(dir_path, false)
+	local delete = modlib.table.contains(filenames, "delete")
+	if delete then
+		-- Move deletion marker to end through a swap so that it is deleted last
+		filenames[#filenames], filenames[delete] = filenames[delete], filenames[#filenames]
+	end
+	for _, filename in ipairs(filenames) do
+		if delete then
+			remove_if_unused(filename)
+		else
+			local number = filename:match("^" .. modlib.text.escape_magic_chars(dirname) .. "_(%d+)%.png$")
+			if number then
+				number = tonumber(number)
+				if last_filename then
+					if number > highest_number then
+						remove_if_unused(last_filename)
+						highest_number = number
+						last_filename = filename
+					else
+						remove_if_unused(filename)
+					end
+				else
 					highest_number = number
 					last_filename = filename
-				else
-					remove_if_unused(filename)
 				end
-			else
-				highest_number = number
-				last_filename = filename
 			end
 		end
+	end
+	if not used and (delete or #filenames == 0) then
+		assert(os.remove(dir_path))
 	end
 end
 
@@ -115,6 +132,14 @@ function epidermis.write_epidermis(paintable_id, texture_id, raw_png_data)
 	local path, texture_name = epidermis.get_epidermis_path(paintable_id, texture_id)
 	assert(modlib.file.write_binary(path, raw_png_data))
 	return path, texture_name
+end
+
+function epidermis.mark_for_deletion(paintable_id)
+	assert(modlib.file.write_unsafe(concat_path{
+		epidermi_texture_path,
+		("epidermis_paintable_%d"):format(paintable_id),
+		"delete"
+	}, ""))
 end
 
 -- SkinDB

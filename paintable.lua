@@ -292,8 +292,12 @@ function def:on_activate()
 	end, true)
 end
 
--- TODO (engine change needed) remove directory using `minetest.rmdir(self:_get_dir_path())` on object removal
+-- TODO (engine change needed) call this on object removal
 -- See https://github.com/minetest/minetest/pull/11931
+function def:_delete()
+	epidermis.mark_for_deletion(self._.id)
+	self.object:remove()
+end
 
 function def:_get_intersection_infos(mt_pos, mt_direction)
 	local intersection_infos = {}
@@ -404,7 +408,7 @@ function def:_show_control_panel(player)
 	end
 	local backface_culling = self._.backface_culling
 	epidermis.show_formspec(player, table.concat{
-		"size[5.5,1,false]",
+		"size[6.25,1,false]",
 		"real_coordinates[true]",
 		image_button(true, 0.25, "backface_culling", (backface_culling and "backface_visible" or "backface_hidden"),
 			(backface_culling and "Show" or "Hide") .. " back faces"),
@@ -415,7 +419,8 @@ function def:_show_control_panel(player)
 		image_button(false, 2.75, "preview_texture", "checker", "Open texture preview"),
 		image_button(false, 3.5, "upload", "upload", "Upload to SkinDB"),
 		image_button(false, 4, "download", "download", "Pick from SkinDB"),
-		image_button(true, 4.75, "close", "cross", "Close"),
+		image_button(false, 4.75, "delete", "bin", "Delete"),
+		image_button(true, 5.5, "close", "cross", "Close"),
 	}, function(fields)
 		if fields.backface_culling then
 			self:_set_backface_culling(not self._.backface_culling)
@@ -434,6 +439,8 @@ function def:_show_control_panel(player)
 			end)
 		elseif fields.preview_texture then
 			self:_show_texture_preview(player)
+		elseif fields.delete then
+			self:_show_delete_formspec(player)
 		elseif fields.upload then
 			self:_show_upload_formspec(player)
 		elseif fields.download then
@@ -457,6 +464,22 @@ function def:_show_texture_preview(player)
 	}, function(fields)
 		if fields.back then
 			self:_show_control_panel(player)
+		end
+	end)
+end
+
+function def:_show_delete_formspec(player)
+	epidermis.show_formspec(player, table.concat{
+		"size[6,1,false]",
+		"real_coordinates[true]",
+		"label[0.25,0.5;Irreversably delete paintable?]",
+		"image_button_exit[4.75,0.25;0.5,0.5;epidermis_check.png;confirm;]";
+		"tooltip[confirm;Confirm]",
+		"image_button_exit[5.25,0.25;0.5,0.5;epidermis_cross.png;close;]",
+		"tooltip[close;Close]",
+	}, function(fields)
+		if fields.confirm then
+			self:_delete()
 		end
 	end)
 end
