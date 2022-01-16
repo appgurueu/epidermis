@@ -171,14 +171,14 @@ Automatically sync with SkinDB at startup, continue syncing during game
 
 ## Possible future features
 
-- [ ] 3D armor support
-- [ ] Restart server if a certain amount of dynamic texture data has been reached (100 MB?)
-- [ ] Paintable transportability (as items?) & trashability
-- [ ] Better icons (play button for animation?)
-- [ ] Skinmaker support to add 2-dimensional texture painting
-- [ ] Semi-transparency painting support
-  - Pointless as long as Minetest doesn't properly support semitransparency for CAOs
-- [ ] Survival mode
-  - [ ] Obtaining paintable epidermi through skinning
-  - [ ] Dye rewrite with color mixing and limited color supply
-- [ ] SkinDB replacement server
+* [ ] 3D armor support
+* [ ] Restart server if a certain amount of dynamic texture data has been reached (100 MB?)
+* [ ] Paintable transportability (as items?) & trashability
+* [ ] Better icons (play button for animation?)
+* [ ] Skinmaker support to add 2-dimensional texture painting
+* [ ] Semi-transparency painting support
+  * Pointless as long as Minetest doesn't properly support semitransparency for CAOs
+* [ ] Survival mode
+  * [ ] Obtaining paintable epidermi through skinning
+  * [ ] Dye rewrite with color mixing and limited color supply
+* [ ] SkinDB replacement server
