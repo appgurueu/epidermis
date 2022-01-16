@@ -1,4 +1,5 @@
 local player_api = rawget(_G, "player_api")
+local nodecore = rawget(_G, "nodecore")
 
 local function get_textures(player)
 	if player_api then
@@ -32,7 +33,18 @@ function epidermis.get_skin(player)
 	return get_texture(player, skin_texture_index)
 end
 
+local nc_skins = {}
+if nodecore then
+	local player_skin = nodecore.player_skin
+	function nodecore.player_skin(player, ...)
+		return nc_skins[player:get_player_name()] or player_skin(player, ...)
+	end
+end
 function epidermis.set_skin(player, skin)
+	if nodecore then
+		nc_skins[player:get_player_name()] = skin
+		return
+	end
 	set_texture(player, skin_texture_index, skin)
 end
 
@@ -43,9 +55,22 @@ function epidermis.get_model(player)
 	return player:get_properties().mesh
 end
 
+local nc_models = {}
+if nodecore then
+	local player_visuals_base = nodecore.player_visuals_base
+	function nodecore.player_visuals_base(player)
+		local visuals = player_visuals_base(player)
+		visuals.mesh = nc_models[player:get_player_name()] or visuals.mesh
+		return visuals
+	end
+end
 function epidermis.set_model(player, model)
 	if player_api then
 		player_api.set_model(player, model)
+		return
+	end
+	if nodecore then
+		nc_models[player:get_player_name()] = model
 		return
 	end
 	player:set_properties{mesh = model}

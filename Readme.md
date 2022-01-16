@@ -57,6 +57,13 @@ The following tool textures (within the `textures/tools` folder) have been creat
   * Picking SkinDB skins for yourself or as Epidermis base textures
   * Upload to SkinDB
 
+## Supported Games
+
+* [x] [Minetest Game](https://github.com/minetest/minetest_game) and most derivatives (`player_api` support)
+* [x] [NodeCore](https://gitlab.com/sztest/nodecore)
+
+Other games are likely to work too. Try it and see.
+
 ## Comparison
 
 ### 2D Texture Painting Mods
@@ -164,7 +171,6 @@ Automatically sync with SkinDB at startup, continue syncing during game
 
 ## Possible future features
 
-- [ ] NodeCore support
 - [ ] 3D armor support
 - [ ] Restart server if a certain amount of dynamic texture data has been reached (100 MB?)
 - [ ] Paintable transportability (as items?) & trashability
