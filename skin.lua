@@ -35,3 +35,18 @@ end
 function epidermis.set_skin(player, skin)
 	set_texture(player, skin_texture_index, skin)
 end
+
+function epidermis.get_model(player)
+	if player_api then
+		return player_api.get_animation(player).model
+	end
+	return player:get_properties().mesh
+end
+
+function epidermis.set_model(player, model)
+	if player_api then
+		player_api.set_model(player, model)
+		return
+	end
+	player:set_properties{mesh = model}
+end

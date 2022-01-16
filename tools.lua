@@ -17,7 +17,7 @@ minetest.register_craftitem("epidermis:spawner_paintable", {
 			minetest.serialize{
 				owner = user:get_player_name(),
 				base_texture = base_texture,
-				mesh = assert(player_api.get_animation(user).model)
+				mesh = assert(epidermis.get_model(user))
 			}
 		)
 		if not object then

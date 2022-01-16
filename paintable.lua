@@ -382,11 +382,10 @@ function def:on_punch(puncher)
 		self:_update_texture()
 		epidermis.set_player_data(player_name, {epidermis = self._.base_texture})
 		-- Swap skins & meshes with owner
-		local puncher_model = player_api.get_animation(puncher).model
+		local puncher_model = epidermis.get_model(puncher)
 		local puncher_skin = epidermis.get_skin(puncher)
-		player_api.set_model(puncher, self._.mesh)
+		epidermis.set_model(puncher, self._.mesh)
 		epidermis.set_skin(puncher, self._.base_texture)
-		player_api.set_textures(puncher, {self._.base_texture})
 		if puncher_skin:match"^[^%[%^]+%.png$" then -- simple texture without modifiers
 			self:_set_mesh(puncher_model)
 			self:_set_texture(puncher_skin, true)
