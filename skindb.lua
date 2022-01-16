@@ -46,9 +46,11 @@ function epidermis.upload(params)
 		end
 		local status, data_or_err = pcall(modlib.json.read_string, modlib.json, res.data)
 		if not status then
-			params.on_complete("JSON error: " .. data_or_err)
+			local err = data_or_err
+			params.on_complete("JSON error: " .. err)
 			return
 		end
+		local data = data_or_err
 		if not data.success then
 			local message = data.status_msg
 			if #message > 100 then -- trim to 100 characters
