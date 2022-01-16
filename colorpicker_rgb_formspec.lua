@@ -1,7 +1,8 @@
 local function get_gradient_texture(component, color)
 	local old_value = color[component]
 	color[component] = 255
-	local texture = ("epxw.png^[multiply:%s^[resize:256x1^[mask:epidermis_gradient_%s.png"):format(color:to_string(), component)
+	local texture = ("epxw.png^[multiply:%s^[resize:256x1^[mask:epidermis_gradient_%s.png")
+		:format(color:to_string(), component)
 	color[component] = old_value
 	return texture
 end
@@ -27,7 +28,8 @@ function epidermis.show_colorpicker_formspec(player, color, callback)
 			local component_short = component:sub(1, 1):lower()
 			local y = 0.25 + index * 1.25
 			table.insert(fs, ("scrollbar[0.25,%f;8,0.5;horizontal;%s;%d]"):format(y, component_short, color[component_short]))
-			table.insert(fs, ("label[0.25,%f;%s]"):format(y + 0.75, minetest.colorize(("#%06X"):format(0xFF * 0x100 ^ (3 - index)), component:sub(1, 1))))
+			table.insert(fs, ("label[0.25,%f;%s]")
+				:format(y + 0.75, minetest.colorize(("#%06X"):format(0xFF * 0x100 ^ (3 - index)), component:sub(1, 1))))
 			table.insert(fs, ("image[0.75,%f;6.5,0.5;%s]"):format(y + 0.5, get_gradient_texture(component_short, color)))
 			table.insert(fs, ("field[7.25,%f;1,0.5;field_%s;;%s]"):format(y + 0.5, component_short, color[component_short]))
 			table.insert(fs, ("field_close_on_enter[field_%s;false]"):format(component_short))

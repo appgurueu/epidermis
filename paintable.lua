@@ -279,7 +279,8 @@ function def:on_activate()
 		local texture
 		path, texture = epidermis.get_last_epidermis_path(self._.id)
 		if path then
-			minetest.log("warning", ("Force-upgrading paintable #%d to texture %s due to staticdata loss"):format(self._.id, texture))
+			minetest.log("warning", ("Force-upgrading paintable #%d to texture %s due to staticdata loss")
+				:format(self._.id, texture))
 			self:_set_texture(texture, true) -- related staticdata must be overwritten, as it relates to the old texture
 		else
 			minetest.log("warning", ("No texture for paintable #%d available, defaulting to character.png."):format(self._.id))
@@ -312,7 +313,8 @@ function def:_get_intersection_infos(mt_pos, mt_direction)
 	local rotation_axis, rotation_angle = epidermis.vector_axis_angle(rotation)
 	-- Instead of transforming all triangle vertices, we inversely transform the ray, which is a lot cheaper
 	local inv_trans_dir = mlvec.rotate3((direction / scale):normalize(), rotation_axis, -rotation_angle)
-	local inv_trans_rel_pos = mlvec.rotate3(pos - mlvec.from_minetest(self.object:get_pos()), rotation_axis, -rotation_angle)
+	local inv_trans_rel_pos = mlvec.rotate3(pos - mlvec.from_minetest(self.object:get_pos()),
+		rotation_axis, -rotation_angle)
 
 	for texid, tris in pairs(assert(models[properties.mesh]).triangle_sets) do
 		for _, triangle in pairs(tris) do
@@ -537,7 +539,9 @@ function def:_show_upload_formspec(player, message)
 		local credit, completeness = context.credit, context.completeness
 		local name, author = modlib.text.trim_spacing(fields.name or ""), modlib.text.trim_spacing(fields.author or "")
 		if not (credit and completeness and name ~= "" and author ~= "") then
-			self:_show_upload_formspec(player, minetest.colorize(epidermis.colors.error:to_string(), "Please fill out the form!"))
+			self:_show_upload_formspec(player,
+				minetest.colorize(epidermis.colors.error:to_string(),
+				"Please fill out the form!"))
 			return
 		end
 		epidermis.close_formspec(player)
@@ -581,9 +585,9 @@ function def:_show_picker_formspec(player)
 		results = epidermis.skins,
 		index = #epidermis.skins
 	}
-	local function show_formspec()
+	local function get_formspec()
 		local skin = assert(context.results[context.index])
-		epidermis.show_formspec(player, table.concat{
+		return table.concat{
 			"size[8.5,5.25,false]",
 			"real_coordinates[true]",
 			"label[0.25,0.5;Pick a texture:]",
@@ -603,21 +607,26 @@ function def:_show_picker_formspec(player)
 			"label[3.5,1.75;Author: ", FSE(skin.author), "]";
 			"label[3.5,2.25;License: ", FSE(skin.license), "]";
 			"label[3.5,2.75;Uploaded: ", FSE(skin.uploaded), "]";
-			"label[3.5,3.25;", FSE(context.message or (skin.deleted and minetest.colorize(epidermis.colors.error:to_string(), "This skin was deleted!")) or ""), "]";
-			("hypertext[4.75,4.45;2,0.7;_of;<global valign=middle halign=right>%d/%d]"):format(context.index, #context.results), -- HACK
+			"label[3.5,3.25;", FSE(context.message
+				or (skin.deleted and minetest.colorize(epidermis.colors.error:to_string(), "This skin was deleted!")) or ""), "]";
+			("hypertext[4.75,4.45;2,0.7;_of;<global valign=middle halign=right>%d/%d]")
+				:format(context.index, #context.results), -- HACK
 			"image_button[6.75,4.5;0.5,0.5;", FSE(epidermis.textures.dice), ";random;]";
 			"tooltip[random;Random]",
 			"image_button[7.25,4.5;0.5,0.5;", FSE(epidermis.textures.previous), ";previous;]";
 			"tooltip[previous;Previous]",
 			"image_button[7.75,4.5;0.5,0.5;", FSE(epidermis.textures.next), ";next;]";
 			"tooltip[next;Next]",
-		}, function(fields)
+		}
+	end
+	local function show_formspec()
+		epidermis.show_formspec(player, get_formspec(), function(fields)
 			if fields.set then
-				local skin = context.results[context.index]
-				if skin.deleted then
+				local selected_skin = context.results[context.index]
+				if selected_skin.deleted then
 					epidermis.send_notification(player, "The selected skin was deleted!")
 				else
-					self:_set_texture(skin.texture, true)
+					self:_set_texture(selected_skin.texture, true)
 				end
 				return
 			end

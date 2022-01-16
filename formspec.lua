@@ -27,7 +27,6 @@ function epidermis.show_formspec(player, formspec, handler)
 	}
 	id = id + 1
 	if id > 2^50 then id = 1 end
-	-- See https://github.com/minetest/minetest/issues/11907: Formspecs must not use exit buttons if there are to be following stages
 	minetest.show_formspec(player_name, formspec_name, formspec)
 end
 

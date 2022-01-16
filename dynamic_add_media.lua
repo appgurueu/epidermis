@@ -1,5 +1,7 @@
 local media_paths = epidermis.media_paths
--- TODO keep count of total added media, force-kick players after their RAM is too full, restart after server disk is too full
+-- TODO keep count of total added media:
+-- Force-kick players after their RAM is too full
+-- Restart after server disk is too full
 function epidermis.dynamic_add_media(path, on_all_received, ephemeral)
 	local filename = modlib.file.get_name(path)
 	local existing_path = media_paths[filename]
@@ -26,7 +28,8 @@ function epidermis.dynamic_add_media(path, on_all_received, ephemeral)
 	for player in modlib.minetest.connected_players() do
 		local name = player:get_player_name()
 		if minetest.get_player_information(name).protocol_version < 39 then
-			minetest.kick_player(name, "Your Minetest client is outdated (< 5.3) and can't receive dynamic media. Rejoin to get the added media.")
+			minetest.kick_player(name,
+				"Your Minetest client is outdated (< 5.3) and can't receive dynamic media. Rejoin to get the added media.")
 		else
 			to_receive[name] = true
 		end

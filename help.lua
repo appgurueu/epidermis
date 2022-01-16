@@ -45,7 +45,13 @@ local help = {
 		"Epidermis Spawner",
 		"Spawns a paintable epidermis that copies your skin. Use your bare hands on the paintable:",
 		"- Left-click (punch) to swap skins",
-		"- Right-click (interact) to open the control panel, which allows toggling backface culling, changing rotation, previewing the texture, playing the animation, picking a texture from and uploading to SkinDB"
+		"- Right-click (interact) to open the control panel, which allows " .. table.concat({
+			"toggling backface culling",
+			"changing rotation",
+			"previewing the texture",
+			"playing the animation",
+			"picking a texture from and uploading to SkinDB"
+		}, ", ") .. "."
 	),
 	item_(
 		"epidermis:spawner_colorpicker",
@@ -56,19 +62,23 @@ local help = {
 	item_(
 		"epidermis:undo_redo",
 		"Undo / redo",
-		"Left-click to undo the last action, right-click to redo undone actions. Only a limited amount of actions can be undone / redone."
+		"Left-click to undo the last action, right-click to redo undone actions. "
+		.. "Only a limited amount of actions can be undone / redone."
 	),
 	item_(
 		"epidermis:eraser",
 		"Eraser",
-		"Left-click to mark a pixel as transparent, right-click to restore opacity of the first transparent pixel above the pointed pixel."
+		"Left-click to mark a pixel as transparent, "
+		.. "right-click to restore opacity of the first transparent pixel above the pointed pixel."
 	),
 	tags.b({
-		"The painting tools below support right-clicking an epidermis or HSV color picker to choose a color. If nothing is pointed, you will be shown a RGB color picker.",
+		"The painting tools below support right-clicking an epidermis or HSV color picker to choose a color. ",
+		"If nothing is pointed, you will be shown a RGB color picker.",
 	}),
 	"\n",
 	item_("epidermis:pen", "Pen", "Left-click to set a single pixel."),
-	item_("epidermis:filling_bucket", "Filling Bucket", "Left-click to fill pixels of (exactly) the same color on the texture."),
+	item_("epidermis:filling_bucket", "Filling Bucket",
+		"Left-click to fill pixels of (exactly) the same color on the texture."),
 	item_("epidermis:line", "Line", "Drag to draw a line. The line is drawn on the texture, not the model."),
 	item_(
 		"epidermis:rectangle",

@@ -48,7 +48,9 @@ minetest.register_craftitem("epidermis:spawner_colorpicker", {
 		-- HACK assuming a node size of exactly one
 		local face_pos = vector.divide(vector.add(pointed_thing.above, pointed_thing.under), 2)
 		local direction = vector.direction(pointed_thing.under, pointed_thing.above)
-		local object = minetest.add_entity(vector.add(face_pos, vector.multiply(direction, colorpicker_thickness/2)), colorpicker_name)
+		local object = minetest.add_entity(
+			vector.add(face_pos, vector.multiply(direction, colorpicker_thickness/2)),
+			colorpicker_name)
 		if not object then
 			send_notification(user, "Can't spawn colorpicker!", "error")
 			return
@@ -68,7 +70,9 @@ local function set_item_color(itemstack, colorspec)
 		-- Bright background: Choose a dark foreground  color
 		foreground = "#000000"
 	end
-	itemstack:get_meta():set_string("description", minetest.get_background_escape_sequence(colorstring) .. minetest.colorize(foreground, itemstack:get_definition().description))
+	itemstack:get_meta():set_string("description",
+		minetest.get_background_escape_sequence(colorstring)
+		.. minetest.colorize(foreground, itemstack:get_definition().description))
 end
 
 local function get_entity(user, pointed_thing, allow_any)
@@ -181,7 +185,7 @@ end)
 minetest.register_tool("epidermis:eraser", {
 	description = "Eraser",
 	inventory_image = "epidermis_eraser.png",
-	on_secondary_use = function(_itemstack, user, pointed_thing)
+	on_secondary_use = function(_, user, pointed_thing)
 		local paintable = get_entity(user, pointed_thing)
 		if not paintable then
 			return
@@ -201,7 +205,7 @@ minetest.register_tool("epidermis:eraser", {
 			paintable:_update_texture()
 		end
 	end,
-	on_use = function(_itemstack, user, pointed_thing)
+	on_use = function(_, user, pointed_thing)
 		local paintable = get_entity(user, pointed_thing)
 		if not paintable then
 			return
@@ -219,7 +223,7 @@ minetest.register_tool("epidermis:eraser", {
 })
 
 local function undo_redo_use_func(logname)
-	return function(_itemstack, user, pointed_thing)
+	return function(_, user, pointed_thing)
 		local paintable = get_entity(user, pointed_thing)
 		if not paintable then
 			return
@@ -244,9 +248,9 @@ register_color_tool("epidermis:filling_bucket", {
 	inventory_image = "epidermis_filling_paint.png",
 	inventory_overlay = "epidermis_filling_bucket.png",
 }, function(entity, pixelcoord, color)
-	local index = entity:_get_pixel_index(unpack(pixelcoord))
-	local replace_color = entity:_get_color(index)
-	local to_fill = {[index] = replace_color}
+	local start_index = entity:_get_pixel_index(unpack(pixelcoord))
+	local replace_color = entity:_get_color(start_index)
+	local to_fill = {[start_index] = replace_color}
 	local additions
 	local width, height = entity._.width, entity._.height
 	local function fill(index)
@@ -310,9 +314,14 @@ minetest.register_globalstep(function()
 			local def = wielded_item:get_definition()
 			local range = def.range or 4
 			local eye_pos = moblib.get_eye_pos(player)
-			local raycast = minetest.raycast(eye_pos, vector.add(eye_pos, vector.multiply(player:get_look_dir(), range)), true, def.liquids_pointable)
+			local raycast = minetest.raycast(eye_pos,
+				vector.add(eye_pos, vector.multiply(player:get_look_dir(), range)),
+				true, def.liquids_pointable)
 			local pointed_thing = raycast()
-			if pointed_thing.type == "object" and pointed_thing.ref:is_player() and pointed_thing.ref:get_player_name() == name then
+			if pointed_thing.type == "object"
+				and pointed_thing.ref:is_player()
+				and pointed_thing.ref:get_player_name() == name
+			then
 				-- Skip player
 				pointed_thing = raycast(pointed_thing)
 			end
@@ -364,7 +373,8 @@ register_color_tool("epidermis:rectangle", {
 			local max = modlib.vector.combine(pixelcoord_start, pixelcoord_end, math.max)
 			local dim = max - min
 			local preview = "^[combine:" .. entity._.width .. "x" .. entity._.height
-				.. ":" .. min[1] .."," .. min[2] .. "=epxw.png\\^[multiply\\:" .. color:to_string() .. "\\^[resize\\:" .. (dim[1] + 1) .. "x" .. (dim[2] + 1)
+				.. ":" .. min[1] .."," .. min[2] .. "=epxw.png\\^[multiply\\:" .. color:to_string()
+				.. "\\^[resize\\:" .. (dim[1] + 1) .. "x" .. (dim[2] + 1)
 			entity:_update_texture(preview)
 		end,
 		pixels = function(pixelcoord_end)
@@ -392,22 +402,23 @@ register_color_tool("epidermis:line", {
 		entity = entity,
 		-- A pixel preview is sufficient here as the line may at most have max(width, height) pixels
 		pixels = function(pixelcoord_end)
-			local pixelcoord_start = pixelcoord_start
+			-- This might be copied & swapped. We don't want this to affect the upvalue, so we localize it.
+			local pixelcoord_start_copy = pixelcoord_start
 			-- Uses Bresenham's line algorithm
-			local diff = modlib.vector.subtract(pixelcoord_end, pixelcoord_start)
+			local diff = modlib.vector.subtract(pixelcoord_end, pixelcoord_start_copy)
 			if diff:norm() == 0 then
 				-- Early return: We would divide by zero when obtaining the slope otherwise
-				local idx = entity:_get_pixel_index(unpack(pixelcoord_start))
+				local idx = entity:_get_pixel_index(unpack(pixelcoord_start_copy))
 				return {[idx] = entity:_get_color(idx)}, color_argb
 			end
 			local swapped
 			if math.abs(diff[2]) > math.abs(diff[1]) then
 				swapped = true
-				pixelcoord_start = {pixelcoord_start[2], pixelcoord_start[1]}
+				pixelcoord_start_copy = {pixelcoord_start_copy[2], pixelcoord_start_copy[1]}
 				pixelcoord_end = {pixelcoord_end[2], pixelcoord_end[1]}
 			end
 			local actions = {}
-			local min = pixelcoord_start
+			local min = pixelcoord_start_copy
 			local max = pixelcoord_end
 			if min[1] > max[1] then
 				min, max = max, min
