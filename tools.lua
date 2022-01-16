@@ -41,7 +41,7 @@ local colorpicker_thickness = minetest.registered_entities[colorpicker_name]._th
 minetest.register_craftitem("epidermis:spawner_colorpicker", {
 	description = "HSV colorpicker spawner",
 	inventory_image = "epidermis_palette.png",
-	on_place = function(itemstack, _user, pointed_thing)
+	on_place = function(itemstack, user, pointed_thing)
 		if pointed_thing.type ~= "node" then
 			return
 		end
