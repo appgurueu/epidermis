@@ -650,6 +650,7 @@ function def:_show_picker_formspec(player)
 					context.results = epidermis.skins
 					context.index = #epidermis.skins
 					context.message = nil
+					show_formspec()
 					return
 				end
 				context.query = table.concat(query, " ")
