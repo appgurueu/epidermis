@@ -16,7 +16,6 @@ The only ~~outer skin~~ epidermis mod you'll ever need.
 
 * [`modlib`](https://github.com/appgurueu/modlib)
 * [`moblib`](https://github.com/appgurueu/moblib)
-* [`player_api`](https://github.com/minetest/minetest_game/tree/master/mods/player_api)
 
 ### Licensing
 
