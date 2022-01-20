@@ -7,9 +7,9 @@ globals = {
 
 read_globals = {
 	-- Minetest
-    "minetest",
-    "ItemStack",
-    "vector",
+	"minetest",
+	"ItemStack",
+	"vector",
 	-- Mods
 	"modlib",
 	"moblib"
