@@ -131,7 +131,8 @@ real_coordinates[true]
 image_button_exit[7.75,0.25;0.5,0.5;epidermis_cross.png;close;]
 tooltip[close;Close]
 hypertext[0.25,0.25;7.5,4.75;help;<big><b>Epidermis Guide</b></big>]
-hypertext[0.25,0.75;8,4.25;help;%s]]):format(text)
+hypertext[0.25,0.75;8,4.25;help;%s]
+]]):format(text)
 
 function epidermis.show_guide_formspec(player)
 	minetest.show_formspec(player:get_player_name(), "epidermis:guide", formspec)
