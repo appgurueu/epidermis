@@ -168,7 +168,7 @@ local function register_color_tool(name, def, on_paint)
 			return on_paint(entity, intersection_info.pixelcoord, color, user)
 		end
 	end
-	minetest.register_tool(name, def)
+	epidermis.register_tool(name, def)
 end
 
 register_color_tool("epidermis:pen", {
@@ -182,7 +182,7 @@ end)
 
 -- TODO allow holding these items using a globalstep
 
-minetest.register_tool("epidermis:eraser", {
+epidermis.register_tool("epidermis:eraser", {
 	description = "Eraser",
 	inventory_image = "epidermis_eraser.png",
 	on_secondary_use = function(_, user, pointed_thing)
@@ -236,7 +236,7 @@ local function undo_redo_use_func(logname)
 	end
 end
 
-minetest.register_tool("epidermis:undo_redo", {
+epidermis.register_tool("epidermis:undo_redo", {
 	description = "Undo / Redo",
 	inventory_image = "epidermis_undo_redo.png",
 	on_secondary_use = undo_redo_use_func"redo",

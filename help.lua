@@ -150,7 +150,7 @@ minetest.register_chatcommand("epidermis_guide", {
 	end
 })
 
-minetest.register_tool("epidermis:guide", {
+epidermis.register_tool("epidermis:guide", {
 	description = "Epidermis Guide",
 	inventory_image = "epidermis_book.png",
 	on_use = function(_, user)

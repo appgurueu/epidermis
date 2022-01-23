@@ -7,3 +7,11 @@ function epidermis.on_cheat(player, cheat)
 	minetest.log("warning", "Kicked " .. name .. " for cheating: " .. modlib.json:write_string(cheat))
 	minetest.kick_player(name, "Kicked for cheating")
 end
+
+local visible_wielditem = rawget(_G, "visible_wielditem")
+function epidermis.register_tool(name, def)
+	minetest.register_tool(name, def)
+	if visible_wielditem then
+		visible_wielditem.item_tweaks.names[name] = {rotation = vector.new(0, 0, -90)}
+	end
+end
