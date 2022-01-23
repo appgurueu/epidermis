@@ -164,6 +164,7 @@ end
 
 local function page(pagenum, per_page, on_complete)
 	fetch_page(pagenum, per_page, function(pages, skins)
+		pagenum = math.min(pagenum, pages)
 		local start = math.min(1 + #epidermis.skins - (pagenum - 1) * per_page, per_page + 1)
 		for i = start - 1, 1, -1 do
 			local index = i + (pagenum - 1) * per_page
