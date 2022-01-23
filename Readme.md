@@ -92,6 +92,10 @@ You can expect each active entity to consume memory proportional to the texture 
 
 The dynamic media API allows marking media as `ephemeral`, which means it isn't cached clientside *and* not sent to new clients. Unfortunately this means that joining players don't receive the media, which would result in undefined behavior. Therefore, this fills up client & server disk space in it's current form. Server disk space is automatically cleared on startup; client cache must be cleared manually.
 
+### Texture Packs
+
+As Epidermis runs fully serverside, it can't support clientside texture packs. Serverside texture packs aren't supported either, as Epidermis (modlib actually) only has access to mod folders. A serverside texture pack [can be implemented using a mod](https://github.com/appgurueu/ghosts#server-side-texture-packs) however.
+
 ## Mod Limitations
 
 ### [`wield3d`](https://github.com/stujones11/wield3d)
