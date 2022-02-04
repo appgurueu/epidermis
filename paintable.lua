@@ -205,7 +205,7 @@ function def:_set_texture(texture, reset)
 		}
 	end
 	self._paintable_pixels = {}
-	local file = io.open(assert(media_paths[self._.base_texture], self._.base_texture), "r")
+	local file = io.open(assert(media_paths[self._.base_texture], self._.base_texture), "rb")
 	local png = modlib.minetest.decode_png(file)
 	assert(not file:read(1), "EOF expected")
 	file:close()
