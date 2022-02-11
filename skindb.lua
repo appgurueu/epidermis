@@ -98,7 +98,10 @@ local function load_local_copy()
 	end
 	on_local_copy_loaded()
 end
-minetest.after(0, load_local_copy)
+-- HACK wait a globalstep before loading the local copy to prevent the dynamic media join race condition in singleplayer
+minetest.after(0, function()
+	minetest.after(0, load_local_copy)
+end)
 
 local timeout = 10
 local html_unescape = modlib.web.html.unescape
