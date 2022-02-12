@@ -100,7 +100,7 @@ As Epidermis runs fully serverside, it can't support clientside texture packs. S
 
 ### [`wield3d`](https://github.com/stujones11/wield3d)
 
-Does not display the colors of wielded items.
+Does not display the colors of wielded items. Use [`visible_wielditem`](https://github.com/appgurueu/visible_wielditem) instead.
 
 ## Hints
 
