@@ -1,4 +1,3 @@
-local FSE = minetest.formspec_escape
 local mlvec = modlib.vector
 
 local function mlvec_interpolate_barycentric(u, v, p_1, p_2, p_3)
@@ -402,26 +401,90 @@ function def:on_punch(puncher)
 end
 
 function def:_show_control_panel(player)
-	local function image_button(exit, x, name, icon, tooltip)
-		return ("image_button%s[%f,0.25;0.5,0.5;%s;%s;]")
-			:format(exit and "_exit" or "", x, epidermis.textures[icon] or ("epidermis_" .. icon .. ".png"), name)
-			.. ("tooltip[%s;%s]"):format(name, FSE(tooltip))
-	end
 	local backface_culling = self._.backface_culling
-	epidermis.show_formspec(player, table.concat{
-		"size[6.25,1,false]",
-		"real_coordinates[true]",
-		image_button(true, 0.25, "backface_culling", (backface_culling and "backface_visible" or "backface_hidden"),
-			(backface_culling and "Show" or "Hide") .. " back faces"),
-		image_button(true, 1, "rotation_random", "dice", "Randomize paintable rotation"),
-		image_button(true, 1.5, "rotation_face_you", "eyes", "Rotation: Face you"),
-		image_button(true, 2.25, "preview_animation", "animation", "Play animation"),
-		image_button(false, 2.75, "preview_texture", "checker", "Open texture preview"),
-		image_button(false, 3.5, "upload", "upload", "Upload to SkinDB"),
-		image_button(false, 4, "download", "download", "Pick from SkinDB"),
-		image_button(false, 4.75, "delete", "bin", "Delete"),
-		image_button(true, 5.5, "close", "cross", "Close"),
-	}, function(fields)
+	local action_groups = {
+		{{
+				exit = true,
+				name = "backface_culling",
+				icon = (backface_culling and "backface_visible" or "backface_hidden"),
+				tooltip = (backface_culling and "Show" or "Hide") .. " back faces"
+		}},
+		{
+			{
+				exit = true,
+				name = "rotation_random",
+				icon = "dice",
+				tooltip = "Randomize paintable rotation"
+			},
+			{
+				exit = true,
+				name = "rotation_face_you",
+				icon = "eyes",
+				tooltip = "Rotation: Face you"
+			},
+		},
+		{
+			{
+				exit = true,
+				name = "preview_animation",
+				icon = "animation",
+				tooltip = "Play animation"
+			},
+			{
+				exit = false,
+				name = "preview_texture",
+				icon = "checker",
+				tooltip = "Open texture preview"
+			},
+		},
+		{
+			{
+				exit = false,
+				name = "upload",
+				icon = "upload",
+				tooltip = "Upload to SkinDB"
+			},
+			{
+				exit = false,
+				name = "download",
+				icon = "download",
+				tooltip = "Pick from SkinDB"
+			}
+		},
+		{{
+			exit = false,
+			name = "delete",
+			icon = "bin",
+			tooltip = "Delete"
+		}},
+		{{
+			exit = true,
+			name = "close",
+			icon = "cross",
+			tooltip = "Close"
+		}}
+	}
+	local fs = {
+		false, -- placeholder
+		{"real_coordinates", true},
+	}
+	local x = 0.25
+	for _, group in ipairs(action_groups) do
+		for _, action in ipairs(group) do
+			table.insert(fs, {
+				"image_button" .. (action.exit and "_exit" or ""),
+				{x, 0.25}; {0.5, 0.5};
+				epidermis.textures[action.icon] or ("epidermis_" .. action.icon .. ".png");
+				action.name;
+				""
+			})
+			table.insert(fs, {"tooltip", action.name; action.tooltip})
+			x = x + 0.5
+		end
+		x = x + 0.25
+	end
+	fs[1] = {"size", {x, 1, false}}
+	epidermis.show_formspec(player, fs, function(fields)
 		if fields.backface_culling then
 			self:_set_backface_culling(not self._.backface_culling)
 		elseif fields.rotation_random then
@@ -452,15 +515,15 @@ end
 function def:_show_texture_preview(player)
 	local fs_content_width = 8
 	local image_height = fs_content_width * (self._.height / self._.width) --[fs units]
-	epidermis.show_formspec(player, table.concat{
-		("size[%f,%f,false]"):format(fs_content_width + 0.5, image_height + 1.25),
-		"real_coordinates[true]",
-		"label[0.25,0.5;Texture Preview:]",
-		("image[0.25,1;%f,%f;%s]"):format(fs_content_width, image_height, FSE(self.object:get_properties().textures[1])),
-		"image_button[7.25,0.25;0.5,0.5;", FSE(epidermis.textures.back), ";back;]";
-		"tooltip[back;Go back]",
-		"image_button_exit[7.75,0.25;0.5,0.5;epidermis_cross.png;close;]",
-		"tooltip[close;Close]",
+	epidermis.show_formspec(player, {
+		{"size", {fs_content_width + 0.5, image_height + 1.25, false}},
+		{"real_coordinates", true},
+		{"label", {0.25, 0.5}; "Texture Preview:"},
+		{"image", {0.25, 1}; {fs_content_width, image_height}, self.object:get_properties().textures[1]},
+		{"image_button", {7.25, 0.25}; {0.5, 0.5}; epidermis.textures.back; "back"; ""},
+		{"tooltip", "back"; "Go back"},
+		{"image_button_exit", {7.75, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "close"; ""},
+		{"tooltip", "close"; "Close"},
 	}, function(fields)
 		if fields.back then
 			self:_show_control_panel(player)
@@ -468,16 +531,17 @@ function def:_show_texture_preview(player)
 	end)
 end
 
+local delete_confirmation_fs = epidermis.build_formspec{
+	{"size", {6, 1, false}},
+	{"real_coordinates", true},
+	{"label", {0.25, 0.5}; "Irreversably delete paintable?"},
+	{"image_button_exit", {4.75, 0.25}; {0.5, 0.5}; "epidermis_check.png"; "confirm"; ""},
+	{"tooltip", "confirm", "Confirm"},
+	{"image_button_exit", {5.25, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "close"; ""},
+	{"tooltip", "close", "Close"},
+}
 function def:_show_delete_formspec(player)
-	epidermis.show_formspec(player, table.concat{
-		"size[6,1,false]",
-		"real_coordinates[true]",
-		"label[0.25,0.5;Irreversably delete paintable?]",
-		"image_button_exit[4.75,0.25;0.5,0.5;epidermis_check.png;confirm;]";
-		"tooltip[confirm;Confirm]",
-		"image_button_exit[5.25,0.25;0.5,0.5;epidermis_cross.png;close;]",
-		"tooltip[close;Close]",
-	}, function(fields)
+	epidermis.show_formspec(player, delete_confirmation_fs, function(fields)
 		if fields.confirm then
 			self:_delete()
 		end
@@ -486,26 +550,24 @@ end
 
 function def:_show_upload_formspec(player, message)
 	local context = {}
-	epidermis.show_formspec(player, table.concat{
-		"size[7.5,4.75,false]",
-		"real_coordinates[true]",
-		("label[0.25,0.5;%s]"):format(FSE("Upload to SkinDB: " .. (message or ""))),
-		"image_button[5.75,0.25;0.5,0.5;", FSE(epidermis.textures.back), ";back;]",
-		"tooltip[back;Go back]",
-		"image_button[6.25,0.25;0.5,0.5;", FSE(epidermis.textures.upload), ";upload;]",
-		"tooltip[upload;Upload]",
-		"image_button_exit[6.75,0.25;0.5,0.5;epidermis_cross.png;cancel;]",
-		"tooltip[cancel;Cancel]",
-		"field[0.25,1.25;7,0.5;name;Name:;]",
-		"field_close_on_enter[name;false]",
-		("field[0.25,2.25;7,0.5;author;Author:;%s]"):format(player:get_player_name()),
-		"field_close_on_enter[author;false]",
-		"label[0.25,3.125;License:]",
-		("dropdown[0.25,3.25;3,0.5;license;%s;1;true]"):format(table.concat(epidermis.upload_licenses, ",")),
-		("checkbox[3.5,3.5;credit;%s;false]")
-			:format(FSE"I have credited properly"),
-		("checkbox[0.25,4.25;completeness;%s;false]")
-			:format(FSE"My skin is complete and ready for upload")
+	epidermis.show_formspec(player, {
+		{"size", {7.5, 4.75, false}},
+		{"real_coordinates", true},
+		{"label", {0.25, 0.5}; "Upload to SkinDB: " .. (message or "")},
+		{"image_button", {5.75, 0.25}; {0.5, 0.5}; epidermis.textures.back; "back"; ""},
+		{"tooltip", "back"; "Go back"},
+		{"image_button", {6.25, 0.25}; {0.5, 0.5}; epidermis.textures.upload; "upload"; ""},
+		{"tooltip", "upload"; "Upload"},
+		{"image_button_exit", {6.75, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "cancel"; ""},
+		{"tooltip", "cancel"; "Cancel"},
+		{"field", {0.25, 1.25}; {7, 0.5}; "name"; "Name:"; ""},
+		{"field_close_on_enter", "name"; false},
+		{"field", {0.25, 2.25}; {7, 0.5}; "author"; "Author:"; player:get_player_name()},
+		{"field_close_on_enter", "author"; false},
+		{"label", {0.25, 3.125}; "License:"},
+		{"dropdown", {0.25, 3.25}; {3, 0.5}; "license"; epidermis.upload_licenses; 1; true},
+		{"checkbox", {3.5, 3.5}; "credit"; "I have credited properly"; false},
+		{"checkbox", {0.25, 4.25}; "completeness"; "My skin is complete and ready for upload"; false},
 	}, function(fields)
 		if fields.quit then
 			return
@@ -586,36 +648,39 @@ function def:_show_picker_formspec(player)
 	}
 	local function get_formspec()
 		local skin = assert(context.results[context.index])
-		return table.concat{
-			"size[8.5,5.25,false]",
-			"real_coordinates[true]",
-			"label[0.25,0.5;Pick a texture:]",
-			"field[3.5,0.25;2,0.5;query;;", FSE(context.query), "]";
-			"field_close_on_enter[query;false]",
-			"image_button[5,0.25;0.5,0.5;epidermis_magnifying_glass.png;search;]",
-			"tooltip[search;Search]",
-			"image_button[6.75,0.25;0.5,0.5;", FSE(epidermis.textures.back), ";back;]",
-			"tooltip[back;Go back]",
-			"image_button_exit[7.25,0.25;0.5,0.5;epidermis_check.png;set;]",
-			"tooltip[set;Set texture]",
-			"image_button_exit[7.75,0.25;0.5,0.5;epidermis_cross.png;cancel;]",
-			"tooltip[cancel;Cancel]",
-			"model[0.25,1;3,4;character;character.b3d;", skin.texture, ";-45,135]";
-			"tooltip[character;Drag to rotate]",
-			"label[3.5,1.25;Name: ", FSE(skin.name), "]";
-			"label[3.5,1.75;Author: ", FSE(skin.author), "]";
-			"label[3.5,2.25;License: ", FSE(skin.license), "]";
-			"label[3.5,2.75;Uploaded: ", FSE(skin.uploaded), "]";
-			"label[3.5,3.25;", FSE(context.message
-				or (skin.deleted and minetest.colorize(epidermis.colors.error:to_string(), "This skin was deleted!")) or ""), "]";
-			("hypertext[4.75,4.45;2,0.7;_of;<global valign=middle halign=right>%d/%d]")
-				:format(context.index, #context.results), -- HACK
-			"image_button[6.75,4.5;0.5,0.5;", FSE(epidermis.textures.dice), ";random;]";
-			"tooltip[random;Random]",
-			"image_button[7.25,4.5;0.5,0.5;", FSE(epidermis.textures.previous), ";previous;]";
-			"tooltip[previous;Previous]",
-			"image_button[7.75,4.5;0.5,0.5;", FSE(epidermis.textures.next), ";next;]";
-			"tooltip[next;Next]",
+		return {
+			{"size", {8.5, 5.25, false}},
+			{"real_coordinates", true},
+			{"label", {0.25, 0.5}; "Pick a texture:"},
+			{"field", {3.5, 0.25}; {2, 0.5}; "query"; ""; context.query};
+			{"field_close_on_enter", "query"; false},
+			{"image_button", {5, 0.25}; {0.5, 0.5}; "epidermis_magnifying_glass.png"; "search"; ""},
+			{"tooltip", "search"; "Search"},
+			{"image_button", {6.75, 0.25}; {0.5, 0.5}; epidermis.textures.back; "back"; ""},
+			{"tooltip", "back"; "Go back"},
+			{"image_button_exit", {7.25, 0.25}; {0.5, 0.5}; "epidermis_check.png"; "set"; ""},
+			{"tooltip", "set"; "Set texture"},
+			{"image_button_exit", {7.75, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "cancel"; ""},
+			{"tooltip", "cancel"; "Cancel"},
+			{"model", {0.25, 1}; {3, 4}; "character"; "character.b3d"; skin.texture; {-45, 135}},
+			{"tooltip", "character"; "Drag to rotate"},
+			{"label", {3.5, 1.25}; "Name: " .. skin.name},
+			{"label", {3.5, 1.75}; "Author: " .. skin.author},
+			{"label", {3.5, 2.25}; "License: " .. skin.license},
+			{"label", {3.5, 2.75}; "Uploaded: " .. skin.uploaded},
+			{"label", {3.5, 3.25}; context.message
+				or (skin.deleted and minetest.colorize(epidermis.colors.error:to_string(), "This skin was deleted!")) or ""},
+			-- HACK use hypertext for right-aligned text
+			{"hypertext", {4.75, 4.45}; {2, 0.7}; "_of"; epidermis.hypertext_root{
+				epidermis.hypertext_tags.global{valign = "middle", halign = "right"},
+				("%d/%d"):format(context.index, #context.results)
+			}},
+			{"image_button", {6.75, 4.5}; {0.5, 0.5}; epidermis.textures.dice, "random"; ""},
+			{"tooltip", "random"; "Random"},
+			{"image_button", {7.25, 4.5}; {0.5, 0.5}; epidermis.textures.previous, "previous"; ""},
+			{"tooltip", "previous"; "Previous"},
+			{"image_button", {7.75, 4.5}; {0.5, 0.5}; epidermis.textures.next, "next"; ""},
+			{"tooltip", "next"; "Next"}
 		}
 	end
 	local function show_formspec()

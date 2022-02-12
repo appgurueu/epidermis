@@ -1,11 +1,5 @@
-local tags = setmetatable({}, {
-	__index = function(_, tag_name)
-		return function(table)
-			table[true] = tag_name
-			return table
-		end
-	end,
-})
+local tags, root_tag = epidermis.hypertext_tags, epidermis.hypertext_root
+
 local function item_(name, title, ...)
 	return {
 		tags.itemtitle{
@@ -22,7 +16,8 @@ local function item_(name, title, ...)
 		"\n",
 	}
 end
-local help = {
+
+local help = root_tag{
 	tags.tag{ name = "itemtitle", size = 18 },
 	tags.tag{ name = "code", font = "mono", color = "lightgreen" },
 	{
@@ -86,53 +81,15 @@ local help = {
 		"Drag to draw a rectangle. The rectangle is drawn on the texture, not the model."
 	),
 }
-local rope = {}
-local function write(text)
-	return table.insert(rope, text)
-end
-local function write_element(element)
-	local tag_name = element[true]
-	if tag_name then
-		write("<")
-		write(tag_name)
-		for k, v in pairs(element) do
-			if type(k) == "string" then
-				write(" ")
-				write(k)
-				write("=")
-				write(v)
-			end
-		end
-		write(">")
-	end
-	if tag_name == "item" or tag_name == "img" or tag_name == "tag" then
-		assert(#element == 0)
-		-- Self-enclosing tags
-		return
-	end
-	for _, child in ipairs(element) do
-		if type(child) == "string" then
-			write(child:gsub(".", { ["\\"] = [[\\]], ["<"] = [[\<]] }))
-		else
-			write_element(child)
-		end
-	end
-	if tag_name then
-		write("</")
-		write(tag_name)
-		write(">")
-	end
-end
-write_element(help)
-local text = minetest.formspec_escape(table.concat(rope))
-local formspec = ([[
-size[8.5,5.25,false]
-real_coordinates[true]
-image_button_exit[7.75,0.25;0.5,0.5;epidermis_cross.png;close;]
-tooltip[close;Close]
-hypertext[0.25,0.25;7.5,4.75;help;<big><b>Epidermis Guide</b></big>]
-hypertext[0.25,0.75;8,4.25;help;%s]
-]]):format(text)
+
+local formspec = epidermis.build_formspec{
+	{"size", {8.5, 5.25, false}},
+	{"real_coordinates", true},
+	{"image_button_exit", {7.75, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "close"; ""},
+	{"tooltip", "close"; "Close"},
+	{"hypertext", {0.25, 0.25}; {7.5, 4.75}; "helptitle"; tags.big{tags.b{"Epidermis Guide"}}},
+	{"hypertext", {0.25, 0.75}; {8, 4.25}; "help"; help}
+}
 
 function epidermis.show_guide_formspec(player)
 	minetest.show_formspec(player:get_player_name(), "epidermis:guide", formspec)
@@ -157,5 +114,3 @@ epidermis.register_tool("epidermis:guide", {
 		epidermis.show_guide_formspec(user)
 	end,
 })
-
-

@@ -7,34 +7,39 @@ local function get_gradient_texture(component, color)
 	return texture
 end
 
+local dice_texture = epidermis.textures.dice
 function epidermis.show_colorpicker_formspec(player, color, callback)
 	local function show_colorpicker_formspec()
 		local fs = {
-			"size[8.5,5.25,false]",
-			"real_coordinates[true]",
-			"scrollbaroptions[min=0;max=255;smallstep=1;largestep=25;thumbsize=1;arrows=show]",
-			"label[0.25,0.5;Pick a color:]",
-			("image[3,0.25;0.5,0.5;epxw.png^[multiply:%s]"):format(color:to_string()),
-			("field[3.5,0.25;2,0.5;color;;%s]"):format(color:to_string()),
-			"field_close_on_enter[color;false]",
-			("image_button[5,0.25;0.5,0.5;%s;random;]"):format(minetest.formspec_escape(epidermis.textures.dice)),
-			"tooltip[random;Random color]",
-			"image_button_exit[7.25,0.25;0.5,0.5;epidermis_check.png;set;]",
-			"tooltip[set;Set color]",
-			"image_button_exit[7.75,0.25;0.5,0.5;epidermis_cross.png;cancel;]",
-			"tooltip[cancel;Cancel]",
+			{"size", {8.5, 5.25}; false},
+			{"real_coordinates", true},
+			{"scrollbaroptions", min = 0; max = 255; smallstep = 1; largestep = 25; thumbsize = 1; arrows = "show"},
+			{"label", {0.25, 0.25}; "Pick a color:"},
+			{"image", {3, 0.25}; {0.5,0.5}; "epxw.png^[multiply:" .. color:to_string()},
+			{"field", {3.5, 0.25}; {2, 0.5}; "color"; ""; color:to_string()},
+			{"field_close_on_enter", "color"; false},
+			{"image_button", {5, 0.25}; {0.5, 0.5}; dice_texture; "random"; ""},
+			{"tooltip", "random"; "Random color"},
+			{"image_button_exit", {7.25, 0.25}; {0.5, 0.5}; "epidermis_check.png"; "set"; ""},
+			{"tooltip", "set"; "Set color"},
+			{"image_button_exit", {7.75,0.25}; {0.5,0.5}; "epidermis_cross.png"; "cancel"; ""},
+			{"tooltip", "cancel"; "Cancel"},
 		}
 		for index, component in ipairs{"Red", "Green", "Blue"} do
-			local component_short = component:sub(1, 1):lower()
+			local first_letter = component:sub(1, 1)
+			local component_short = first_letter:lower()
 			local y = 0.25 + index * 1.25
-			table.insert(fs, ("scrollbar[0.25,%f;8,0.5;horizontal;%s;%d]"):format(y, component_short, color[component_short]))
-			table.insert(fs, ("label[0.25,%f;%s]")
-				:format(y + 0.75, minetest.colorize(("#%06X"):format(0xFF * 0x100 ^ (3 - index)), component:sub(1, 1))))
-			table.insert(fs, ("image[0.75,%f;6.5,0.5;%s]"):format(y + 0.5, get_gradient_texture(component_short, color)))
-			table.insert(fs, ("field[7.25,%f;1,0.5;field_%s;;%s]"):format(y + 0.5, component_short, color[component_short]))
-			table.insert(fs, ("field_close_on_enter[field_%s;false]"):format(component_short))
+			table.insert(fs, {"scrollbar", {0.25, y}; {8, 0.5}; "horizontal", component_short, color[component_short]})
+			table.insert(fs, {
+				"label",
+				{0.25, y + 0.75};
+				minetest.colorize(("#%06X"):format(0xFF * 0x100 ^ (3 - index)), first_letter)
+			})
+			table.insert(fs, {"image", {0.75, y + 0.5}; {6.5, 0.5}; get_gradient_texture(component_short, color)})
+			table.insert(fs, {"field", {7.25, y + 0.5}; {1, 0.5}; "field_" .. component_short; ""; color[component_short]})
+			table.insert(fs, {"field_close_on_enter", "field_" .. component_short; true})
 		end
-		epidermis.show_formspec(player, table.concat(fs), function(fields)
+		epidermis.show_formspec(player, fs, function(fields)
 			if fields.random then
 				color = modlib.minetest.colorspec.new{
 					r = math.random(0, 255),
