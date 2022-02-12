@@ -1,4 +1,3 @@
--- TODO FS building utils
 local formspecs = {}
 
 local id = 1
@@ -18,7 +17,143 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	return true -- don't call remaining functions
 end)
 
+-- S-expression formspec AST to string; purely a syntactical string building helper unaware of semantics
+local function build_formspec(formspec)
+	local rope = {}
+	local function write(text)
+		return table.insert(rope, text)
+	end
+	local function write_escaped(text)
+		return write(minetest.formspec_escape(text))
+	end
+	local function write_primitive(param, write_func)
+		write_func = write_func or write_escaped
+		if param == true then
+			return write_func"true"
+		end
+		if param == false then
+			return write_func"false"
+		end
+		local type_ = type(param)
+		if type_ == "number" then
+			return write_func((param % 1 == 0 and "%d" or "%f"):format(param))
+		end
+		if type_ == "string" then
+			return write_func(param)
+		end
+		error("primitive type expected, got " .. type_)
+	end
+	local function write_options(options, delim)
+		local options_pushed = false
+		for key, value in pairs(options) do
+			if type(key) == "string" then
+				if options_pushed then
+					write(delim)
+				end
+				write_escaped(key)
+				write"="
+				write_primitive(value)
+				options_pushed = true
+			end
+		end
+	end
+	local function write_hypertext_escaped(text)
+		return write_escaped(text:gsub(".", { ["\\"] = [[\\]], ["<"] = [[\<]] }))
+	end
+	local function write_hypertext_primitive(value)
+		return write_primitive(value, write_hypertext_escaped)
+	end
+	local function write_hypertext(element)
+		local mt = getmetatable(element) or {}
+		if mt.tag_name then
+			write"<"
+			write_hypertext_escaped(mt.tag_name)
+			for k, v in pairs(element) do
+				if type(k) == "string" then
+					write" "
+					write_hypertext_primitive(k)
+					write"="
+					write_hypertext_primitive(v)
+				end
+			end
+			write">"
+		end
+		if mt.self_enclosing then
+			assert(#element == 0)
+			return
+		end
+		for _, child in ipairs(element) do
+			if type(child) == "string" then
+				write_hypertext_primitive(child)
+			else
+				write_hypertext(child)
+			end
+		end
+		if mt.tag_name then
+			write"</"
+			write_hypertext_escaped(mt.tag_name)
+			write">"
+		end
+	end
+	for _, element in ipairs(formspec) do
+		if type(element) == "string" then -- assume top-level elements are simply formspec elements in string form
+			write(element)
+		else
+			write(element[1])
+			write"["
+			local len = #element
+			for index = 2, len do
+				if index > 2 then write";" end
+				local param = element[index]
+				if type(param) == "table" then
+					local mt = getmetatable(param)
+					if mt and mt.hypertext then
+						write_hypertext(param)
+					elseif param[1] == nil then -- sub-options or empty table
+						write_options(param, ",")
+					else -- comma-delimited subparam list
+						for subindex, subparam in ipairs(param) do
+							if subindex > 1 then write"," end
+							write_primitive(subparam)
+						end
+					end
+				else
+					write_primitive(param)
+				end
+			end
+			if len == 1 then -- options element or empty table
+				write_options(element, ";")
+			end
+			write"]"
+			write"\n" -- for debugging purposes (improved readability)
+		end
+	end
+	return table.concat(rope)
+end
+
+function epidermis.build_formspec(formspec)
+	if type(formspec) == "table" then
+		return build_formspec(formspec)
+	end
+	return formspec
+end
+
+local self_enclosing = modlib.table.set{"item", "img", "tag", "global"}
+epidermis.hypertext_tags = modlib.func.memoize(function(tag_name)
+	local metatable = {
+		hypertext = true,
+		tag_name = tag_name,
+		self_enclosing = self_enclosing[tag_name]
+	}
+	return function(table)
+		return setmetatable(table, metatable)
+	end
+end)
+
+epidermis.hypertext_root = epidermis.hypertext_tags[false]
+
 function epidermis.show_formspec(player, formspec, handler)
+	formspec = epidermis.build_formspec(formspec)
 	local player_name = player:get_player_name()
 	local formspec_name = "epidermis:" .. id
 	formspecs[player_name] = {
