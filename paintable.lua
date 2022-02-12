@@ -413,8 +413,7 @@ function def:_show_control_panel(player)
 		"real_coordinates[true]",
 		image_button(true, 0.25, "backface_culling", (backface_culling and "backface_visible" or "backface_hidden"),
 			(backface_culling and "Show" or "Hide") .. " back faces"),
-		"image_button_exit[1,0.25;0.5,0.5;", FSE(epidermis.textures.dice), ";rotation_random;]";
-		"tooltip[rotation_random;Randomize paintable rotation]",
+		image_button(true, 1, "rotation_random", "dice", "Randomize paintable rotation"),
 		image_button(true, 1.5, "rotation_face_you", "eyes", "Rotation: Face you"),
 		image_button(true, 2.25, "preview_animation", "animation", "Play animation"),
 		image_button(false, 2.75, "preview_texture", "checker", "Open texture preview"),
