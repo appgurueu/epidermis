@@ -19,7 +19,7 @@ return setmetatable({}, {__index = function(self, filename)
 	if filename == "character.b3d" and minetest.sha1(modlib.file.read(path)) == bad_character_b3d_hash then
 		path = fixed_character_b3d_path
 	end
-	local model = io.open(path, "r")
+	local model = io.open(path, "rb")
 	local character = assert(modlib.b3d.read(model))
 	assert(not model:read(1))
 	model:close()

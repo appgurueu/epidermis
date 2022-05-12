@@ -1,7 +1,7 @@
 local media_paths = modlib.minetest.media.paths
 
 return setmetatable({}, {__index = function(self, texture_name)
-	local file = io.open(media_paths[texture_name], "r")
+	local file = io.open(media_paths[texture_name], "rb")
 	local png = modlib.minetest.decode_png(file)
 	assert(not file:read(1), "EOF expected")
 	file:close()
