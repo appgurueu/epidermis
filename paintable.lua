@@ -250,7 +250,7 @@ function def:_init()
 	self:_set_texture(self._.base_texture)
 	self:_set_rotation(self._.rotation)
 	self:_set_backface_culling(self._.backface_culling)
-	self.object:set_acceleration{x = 0, y = -0.981, z = 0}
+	self.object:set_acceleration(vector.new(0, -0.981, 0))
 	self.object:set_armor_groups{immortal = 1, punch_operable = 1}
 	self._status = "active"
 end
