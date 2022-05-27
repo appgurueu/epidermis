@@ -251,7 +251,7 @@ function def:_init()
 	self:_set_rotation(self._.rotation)
 	self:_set_backface_culling(self._.backface_culling)
 	self.object:set_acceleration{x = 0, y = -0.981, z = 0}
-	self.object:set_armor_groups{immortal = 1}
+	self.object:set_armor_groups{immortal = 1, punch_operable = 1}
 	self._status = "active"
 end
 
@@ -397,7 +397,6 @@ function def:on_punch(puncher)
 			self:_set_texture("character.png", true)
 		end
 	end)
-	return true
 end
 
 function def:_show_control_panel(player)

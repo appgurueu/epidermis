@@ -126,7 +126,7 @@ function colorpicker:on_activate()
 	self:_set_rotation(self._.rotation or vector.new(0, 0, 0))
 	local object = self.object
 	object:set_acceleration(vector.new(0, -0.981, 0))
-	object:set_armor_groups({ immortal = 1 })
+	object:set_armor_groups({ immortal = 1, punch_operable = 1 })
 end
 
 function colorpicker:_get_color(user)
