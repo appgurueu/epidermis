@@ -1,4 +1,4 @@
-local tags, root_tag = epidermis.hypertext_tags, epidermis.hypertext_root
+local tags, root_tag = fslib.hypertext_tags, fslib.hypertext_root
 
 local function item_(name, title, ...)
 	return {
@@ -82,7 +82,7 @@ local help = root_tag{
 	),
 }
 
-local formspec = epidermis.build_formspec{
+local formspec = fslib.build_formspec{
 	{"size", {8.5, 5.25, false}},
 	{"real_coordinates", true},
 	{"image_button_exit", {7.75, 0.25}; {0.5, 0.5}; "epidermis_cross.png"; "close"; ""},

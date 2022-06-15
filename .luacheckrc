@@ -1,8 +1,8 @@
 globals = {
 	"epidermis",
 	minetest = {
-		"dynamic_add_media" -- overridden
-	}
+		"dynamic_add_media", -- overridden
+	},
 }
 
 read_globals = {
@@ -12,5 +12,6 @@ read_globals = {
 	"vector",
 	-- Mods
 	"modlib",
-	"moblib"
+	"moblib",
+	"fslib",
 }

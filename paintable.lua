@@ -483,7 +483,7 @@ function def:_show_control_panel(player)
 		x = x + 0.25
 	end
 	fs[1] = {"size", {x, 1, false}}
-	epidermis.show_formspec(player, fs, function(fields)
+	fslib.show_formspec(player, fs, function(fields)
 		if fields.backface_culling then
 			self:_set_backface_culling(not self._.backface_culling)
 		elseif fields.rotation_random then
@@ -514,7 +514,7 @@ end
 function def:_show_texture_preview(player)
 	local fs_content_width = 8
 	local image_height = fs_content_width * (self._.height / self._.width) --[fs units]
-	epidermis.show_formspec(player, {
+	fslib.show_formspec(player, {
 		{"size", {fs_content_width + 0.5, image_height + 1.25, false}},
 		{"real_coordinates", true},
 		{"label", {0.25, 0.5}; "Texture Preview:"},
@@ -530,7 +530,7 @@ function def:_show_texture_preview(player)
 	end)
 end
 
-local delete_confirmation_fs = epidermis.build_formspec{
+local delete_confirmation_fs = fslib.build_formspec{
 	{"size", {6, 1, false}},
 	{"real_coordinates", true},
 	{"label", {0.25, 0.5}; "Irreversably delete paintable?"},
@@ -540,7 +540,7 @@ local delete_confirmation_fs = epidermis.build_formspec{
 	{"tooltip", "close", "Close"},
 }
 function def:_show_delete_formspec(player)
-	epidermis.show_formspec(player, delete_confirmation_fs, function(fields)
+	fslib.show_formspec(player, delete_confirmation_fs, function(fields)
 		if fields.confirm then
 			self:_delete()
 		end
@@ -549,7 +549,7 @@ end
 
 function def:_show_upload_formspec(player, message)
 	local context = {}
-	epidermis.show_formspec(player, {
+	fslib.show_formspec(player, {
 		{"size", {7.5, 4.75, false}},
 		{"real_coordinates", true},
 		{"label", {0.25, 0.5}; "Upload to SkinDB: " .. (message or "")},
@@ -604,7 +604,7 @@ function def:_show_upload_formspec(player, message)
 				"Please fill out the form!"))
 			return
 		end
-		epidermis.close_formspec(player)
+		fslib.close_formspec(player)
 		local player_name = player:get_player_name()
 		if not minetest.get_player_privs(player_name).epidermis_upload then
 			epidermis.send_notification(player, 'Missing "epidermis_upload" privilege!', "error")
@@ -670,8 +670,8 @@ function def:_show_picker_formspec(player)
 			{"label", {3.5, 3.25}; context.message
 				or (skin.deleted and minetest.colorize(epidermis.colors.error:to_string(), "This skin was deleted!")) or ""},
 			-- HACK use hypertext for right-aligned text
-			{"hypertext", {4.75, 4.45}; {2, 0.7}; "_of"; epidermis.hypertext_root{
-				epidermis.hypertext_tags.global{valign = "middle", halign = "right"},
+			{"hypertext", {4.75, 4.45}; {2, 0.7}; "_of"; fslib.hypertext_root{
+				fslib.hypertext_tags.global{valign = "middle", halign = "right"},
 				("%d/%d"):format(context.index, #context.results)
 			}},
 			{"image_button", {6.75, 4.5}; {0.5, 0.5}; epidermis.textures.dice, "random"; ""},
@@ -683,7 +683,7 @@ function def:_show_picker_formspec(player)
 		}
 	end
 	local function show_formspec()
-		epidermis.show_formspec(player, get_formspec(), function(fields)
+		fslib.show_formspec(player, get_formspec(), function(fields)
 			if fields.set then
 				local selected_skin = context.results[context.index]
 				if selected_skin.deleted then

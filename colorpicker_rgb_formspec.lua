@@ -39,7 +39,7 @@ function epidermis.show_colorpicker_formspec(player, color, callback)
 			table.insert(fs, {"field", {7.25, y + 0.5}; {1, 0.5}; "field_" .. component_short; ""; color[component_short]})
 			table.insert(fs, {"field_close_on_enter", "field_" .. component_short; true})
 		end
-		epidermis.show_formspec(player, fs, function(fields)
+		fslib.show_formspec(player, fs, function(fields)
 			if fields.random then
 				color = modlib.minetest.colorspec.new{
 					r = math.random(0, 255),
