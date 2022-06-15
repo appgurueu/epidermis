@@ -102,6 +102,11 @@ As Epidermis runs fully serverside, it can't support clientside texture packs. S
 
 Does not display the colors of wielded items. Use [`visible_wielditem`](https://github.com/appgurueu/visible_wielditem) instead.
 
+### [`3d_armor`](https://github.com/minetest-mods/3d_armor)
+
+3D Armor currently completely breaks Epidermis as it changes the player model and makes armor part of the texture.
+No proper alternatives to 3D Armor exist. Attachment-based armor mods like [`equippable_accessories`](https://content.minetest.net/packages/davidthecreator/equippable_accessories/) work fine.
+
 ## Hints
 
 If you want to be able to accurately paint, don't use cinematic camera smoothing or view bobbing. Both will make your look direction inaccurate in certain cases. Alternatively to disabling view bobbing, rest while painting (and use the newest Minetest version).
