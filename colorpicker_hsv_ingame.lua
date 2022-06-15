@@ -1,4 +1,4 @@
-local bar_size = 1/16
+local bar_size = 1 / 16
 local bar_width = bar_size * 256 --[[px]]
 assert(bar_width % 1 == 0)
 local c_comp = { "r", "g", "g", "b", "b", "r" }
@@ -17,7 +17,9 @@ end
 
 local function get_texture(hue)
 	return ("[combine:%dx256:0,0="):format(256 + bar_width)
-		.. get_gradient_texture(hue):gsub("[\\^:]", function(char) return "\\" .. char end) -- escape
+		.. get_gradient_texture(hue):gsub("[\\^:]", function(char)
+			return "\\" .. char
+		end) -- escape
 		.. ([[:256,0=epidermis_gradient_hue.png\^[transformR270\^[resize\:%dx256]]):format(bar_width)
 end
 
@@ -44,9 +46,9 @@ local function get_uv(self, user)
 		return modlib.vector.rotate3(modlib.vector.multiply(vertex, visual_size), rotation_axis, rotation_angle)
 	end
 	local pos_on_ray, u, v = modlib.vector.ray_parallelogram_intersection(relative, direction, {
-		transform{ -0.5, -0.5, 0.5 },
-		transform{ 0.5, -0.5, 0.5 },
-		transform{ -0.5, 0.5, 0.5 },
+		transform { -0.5, -0.5, 0.5 },
+		transform { 0.5, -0.5, 0.5 },
+		transform { -0.5, 0.5, 0.5 },
 	})
 	if pos_on_ray then
 		return u, v
@@ -54,11 +56,7 @@ local function get_uv(self, user)
 end
 
 local function vector_combine(v, w, func)
-	return vector.new(
-		func(v.x, w.x),
-		func(v.y, w.y),
-		func(v.z, w.z)
-	)
+	return vector.new(func(v.x, w.x), func(v.y, w.y), func(v.z, w.z))
 end
 
 local function rotate_boxes(self)
@@ -68,16 +66,19 @@ local function rotate_boxes(self)
 	for index_x = 1, 1 + 3, 3 do
 		for index_y = 2, 2 + 3, 3 do
 			for index_z = 3, 3 + 3, 3 do
-				local pos = vector.rotate(vector.new(collisionbox[index_x], collisionbox[index_y], collisionbox[index_z]), rotation)
+				local pos = vector.rotate(
+					vector.new(collisionbox[index_x], collisionbox[index_y], collisionbox[index_z]),
+					rotation
+				)
 				min = vector_combine(min, pos, math.min)
 				max = vector_combine(max, pos, math.max)
 			end
 		end
 	end
-	local box = {min.x, min.y, min.z, max.x, max.y, max.z}
-	self.object:set_properties{
+	local box = { min.x, min.y, min.z, max.x, max.y, max.z }
+	self.object:set_properties {
 		collisionbox = box,
-		selectionbox = box
+		selectionbox = box,
 	}
 end
 
@@ -86,7 +87,7 @@ local colorpicker = {}
 local thickness = 0.01
 colorpicker._thickness = thickness
 local height = 1 / (1 + bar_size)
-local box = { -0.5, -height/2, -thickness/2, 0.5, height/2, thickness/2 }
+local box = { -0.5, -height / 2, -thickness / 2, 0.5, height / 2, thickness / 2 }
 colorpicker.initial_properties = {
 	visual = "cube",
 	visual_size = vector.new(1, height, thickness),
@@ -98,12 +99,12 @@ colorpicker.initial_properties = {
 }
 
 colorpicker.lua_properties = {
-	staticdata = "lua"
+	staticdata = "lua",
 }
 
 function colorpicker:_set_hue(hue)
 	self._.hue = hue
-	self.object:set_properties({
+	self.object:set_properties {
 		textures = {
 			"epxb.png",
 			"epxb.png",
@@ -112,7 +113,7 @@ function colorpicker:_set_hue(hue)
 			get_texture(hue),
 			"epxb.png",
 		},
-	})
+	}
 end
 
 function colorpicker:_set_rotation(rotation)
@@ -126,7 +127,7 @@ function colorpicker:on_activate()
 	self:_set_rotation(self._.rotation or vector.new(0, 0, 0))
 	local object = self.object
 	object:set_acceleration(vector.new(0, -0.981, 0))
-	object:set_armor_groups({ immortal = 1, punch_operable = 1 })
+	object:set_armor_groups { immortal = 1, punch_operable = 1 }
 end
 
 function colorpicker:_get_color(user)

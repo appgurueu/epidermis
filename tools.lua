@@ -180,7 +180,7 @@ register_color_tool("epidermis:pen", {
 	entity:_update_texture()
 end)
 
--- TODO allow holding these items using a globalstep
+-- TODO (?) allow holding these items using a globalstep
 
 epidermis.register_tool("epidermis:eraser", {
 	description = "Eraser",
