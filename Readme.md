@@ -165,6 +165,9 @@ Left-click to undo, right-click to redo. Undo-redo log size is limited due to [M
 
 ## Configuration
 
+`epidermis` must be added to `secure.http_mods` for SkinDB uploading & downloading (including syncing) to be enabled;
+otherwise epidermis will be limited to the local (offline, cached) SkinDB copy
+
 <!--modlib:conf:2-->
 ### `skindb`
 

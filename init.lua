@@ -9,8 +9,7 @@ include"theme.lua"
 include"send_notification.lua"
 include"colorpicker_rgb_formspec.lua"
 include"colorpicker_hsv_ingame.lua"
-local http = assert(minetest.request_http_api(), "add epidermis to secure.http_mods")
-assert(loadfile(modlib.mod.get_resource("skindb.lua")))(http)
+assert(loadfile(modlib.mod.get_resource("skindb.lua")))(minetest.request_http_api())
 include"skin.lua"
 include"paintable.lua"
 include"tools.lua"

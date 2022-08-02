@@ -436,33 +436,41 @@ function def:_show_control_panel(player)
 				tooltip = "Open texture preview"
 			},
 		},
-		{
-			{
-				exit = false,
-				name = "upload",
-				icon = "upload",
-				tooltip = "Upload to SkinDB"
-			},
-			{
-				exit = false,
-				name = "download",
-				icon = "download",
-				tooltip = "Pick from SkinDB"
-			}
-		},
-		{{
-			exit = false,
-			name = "delete",
-			icon = "bin",
-			tooltip = "Delete"
-		}},
-		{{
-			exit = true,
-			name = "close",
-			icon = "cross",
-			tooltip = "Close"
-		}}
 	}
+
+	local skindb_group = {}
+	if def._show_upload_formspec then
+		table.insert(skindb_group, {
+			exit = false,
+			name = "upload",
+			icon = "upload",
+			tooltip = "Upload to SkinDB"
+		})
+	end
+	if def._show_picker_formspec then
+		table.insert(skindb_group, {
+			exit = false,
+			name = "download",
+			icon = "download",
+			tooltip = "Pick from SkinDB"
+		})
+	end
+	if #skindb_group > 0 then
+		table.insert(action_groups, skindb_group)
+	end
+
+	table.insert(action_groups, {{
+		exit = false,
+		name = "delete",
+		icon = "bin",
+		tooltip = "Delete"
+	}})
+	table.insert(action_groups, {{
+		exit = true,
+		name = "close",
+		icon = "cross",
+		tooltip = "Close"
+	}})
 	local fs = {
 		false, -- placeholder
 		{"real_coordinates", true},
@@ -504,9 +512,13 @@ function def:_show_control_panel(player)
 		elseif fields.delete then
 			self:_show_delete_formspec(player)
 		elseif fields.upload then
-			self:_show_upload_formspec(player)
+			if self._show_upload_formspec then
+				self:_show_upload_formspec(player)
+			end
 		elseif fields.download then
-			self:_show_picker_formspec(player)
+			if self._show_picker_formspec then
+				self:_show_picker_formspec(player)
+			end
 		end
 	end)
 end
@@ -634,6 +646,9 @@ function def:_show_upload_formspec(player, message)
 		}
 	end)
 end
+if not epidermis.upload then -- no SkinDB support
+	def._show_upload_formspec = nil
+end
 
 function def:_show_picker_formspec(player)
 	if #epidermis.skins == 0 then
@@ -748,6 +763,9 @@ function def:_show_picker_formspec(player)
 		end)
 	end
 	show_formspec()
+end
+if not epidermis.skins then -- no SkinDB support
+	def._show_picker_formspec = nil
 end
 
 moblib.register_entity("epidermis:paintable", def)

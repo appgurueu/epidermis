@@ -7,7 +7,53 @@ Assumptions:
 - `GROUP BY` works like `ORDER BY` (otherwise no ordering is guaranteed)
 ]]
 
-local http = assert(...)
+-- Load offline copy
+
+local texture_path = epidermis.paths.dynamic_textures.skindb
+epidermis.skins = {}
+
+local function on_local_copy_loaded() end
+
+local function load_local_copy()
+	local ids = {}
+	for _, filename in ipairs(minetest.get_dir_list(texture_path, false)) do
+		local id = filename:match"^epidermis_skindb_(%d+)%.png$"
+		if id then
+			table.insert(ids, tonumber(id))
+		end
+	end
+	table.sort(ids)
+	for index, id in ipairs(ids) do
+		local filename = ("epidermis_skindb_%d.png"):format(id)
+		local path = modlib.file.concat_path{texture_path, filename}
+		local metafile = assert(io.open(modlib.file.concat_path{texture_path, filename .. ".json"}))
+		local meta = modlib.json:read_file(metafile)
+		metafile:close()
+		meta.texture = "blank.png" -- dynamic media isn't available yet
+		epidermis.skins[index] = meta
+		epidermis.dynamic_add_media(path, function()
+			meta.texture = filename
+		end, false) -- Enable caching for SkinDB skins
+	end
+	on_local_copy_loaded()
+end
+-- HACK wait a globalstep before loading the local copy to prevent the dynamic media join race condition in singleplayer
+minetest.after(0, function()
+	minetest.after(0, load_local_copy)
+end)
+
+-- HTTP-requiring code
+
+local http = ...
+
+if not http then
+	function on_local_copy_loaded()
+		if #epidermis.skins == 0 then -- empty local copy...
+			epidermis.skins = nil -- ... disable skin picking entirely
+		end
+	end
+	return -- disable entirely
+end
 
 local base_url = "http://minetest.fensta.bplaced.net"
 
@@ -68,40 +114,7 @@ minetest.register_privilege("epidermis_upload", {
 	give_to_admin = false,
 })
 
--- "Downloading"
-
-local texture_path = epidermis.paths.dynamic_textures.skindb
-epidermis.skins = {}
-
-local function on_local_copy_loaded() end
-
-local function load_local_copy()
-	local ids = {}
-	for _, filename in ipairs(minetest.get_dir_list(texture_path, false)) do
-		local id = filename:match"^epidermis_skindb_(%d+)%.png$"
-		if id then
-			table.insert(ids, tonumber(id))
-		end
-	end
-	table.sort(ids)
-	for index, id in ipairs(ids) do
-		local filename = ("epidermis_skindb_%d.png"):format(id)
-		local path = modlib.file.concat_path{texture_path, filename}
-		local metafile = assert(io.open(modlib.file.concat_path{texture_path, filename .. ".json"}))
-		local meta = modlib.json:read_file(metafile)
-		metafile:close()
-		meta.texture = "blank.png" -- dynamic media isn't available yet
-		epidermis.skins[index] = meta
-		epidermis.dynamic_add_media(path, function()
-			meta.texture = filename
-		end, false) -- Enable caching for SkinDB skins
-	end
-	on_local_copy_loaded()
-end
--- HACK wait a globalstep before loading the local copy to prevent the dynamic media join race condition in singleplayer
-minetest.after(0, function()
-	minetest.after(0, load_local_copy)
-end)
+-- "Downloading" / Updating
 
 local timeout = 10
 local html_unescape = modlib.web.html.unescape
