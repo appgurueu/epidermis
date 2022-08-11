@@ -292,11 +292,16 @@ function def:on_activate()
 	end, true)
 end
 
--- TODO (engine change needed) call this on object removal
--- See https://github.com/minetest/minetest/pull/11931
 function def:_delete()
 	epidermis.mark_for_deletion(self._.id)
 	self.object:remove()
+end
+
+-- TODO override clearobjects to catch that as well
+function def:on_deactivate(removal)
+	if removal then
+		epidermis.mark_for_deletion(self._.id)
+	end
 end
 
 function def:_get_intersection_infos(mt_pos, mt_direction)
