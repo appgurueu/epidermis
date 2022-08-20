@@ -163,6 +163,10 @@ Floodfills adjacent pixels of exactly the same color, swapping out their color f
 
 Left-click to undo, right-click to redo. Undo-redo log size is limited due to [Memory Usage] constraints.
 
+##### Eraser
+
+Left-click to mark a pixel as transparent, right-click to restore opacity of the first transparent pixel above the pointed pixel.
+
 ## Configuration
 
 `epidermis` must be added to `secure.http_mods` for SkinDB uploading & downloading (including syncing) to be enabled;
