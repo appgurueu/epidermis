@@ -101,8 +101,22 @@ local function get_entity(user, pointed_thing, allow_any)
 	end
 end
 
-local function get_paintable_intersection(user, entity)
-	local intersection_infos = entity:_get_intersection_infos(moblib.get_eye_pos(user), user:get_look_dir())
+local function get_eye_pos(player)
+	local eye_pos = player:get_pos()
+	eye_pos.y = eye_pos.y + player:get_properties().eye_height
+	local first, third = player:get_eye_offset()
+	if not vector.equals(first, third) then
+		minetest.log("warning", "First & third person eye offsets don't match, assuming first person")
+	end
+	return vector.add(eye_pos, vector.divide(first, 10))
+end
+
+local function get_intersection_infos(user, paintable)
+	return paintable:_get_intersection_infos(get_eye_pos(user), user:get_look_dir())
+end
+
+local function get_paintable_intersection(user, paintable)
+	local intersection_infos = get_intersection_infos(user, paintable)
 	for _, intersection_info in ipairs(intersection_infos) do
 		if intersection_info.color.a > 0 then
 			return intersection_info
@@ -191,7 +205,7 @@ epidermis.register_tool("epidermis:eraser", {
 			return
 		end
 		local last_transparent_frontface
-		local intersection_infos = paintable:_get_intersection_infos(moblib.get_eye_pos(user), user:get_look_dir())
+		local intersection_infos = get_intersection_infos(user, paintable)
 		for _, intersection_info in ipairs(intersection_infos) do
 			if intersection_info.color.a < 255 then
 				last_transparent_frontface = intersection_info
@@ -210,7 +224,7 @@ epidermis.register_tool("epidermis:eraser", {
 		if not paintable then
 			return
 		end
-		local intersection_infos = paintable:_get_intersection_infos(moblib.get_eye_pos(user), user:get_look_dir())
+		local intersection_infos = get_intersection_infos(user, paintable)
 		for _, intersection_info in ipairs(intersection_infos) do
 			if intersection_info.color.a > 0 then
 				local idx = paintable:_get_pixel_index(unpack(intersection_info.pixelcoord))
@@ -313,7 +327,7 @@ minetest.register_globalstep(function()
 			local wielded_item = player:get_wielded_item()
 			local def = wielded_item:get_definition()
 			local range = def.range or 4
-			local eye_pos = moblib.get_eye_pos(player)
+			local eye_pos = get_eye_pos(player)
 			local raycast = minetest.raycast(eye_pos,
 				vector.add(eye_pos, vector.multiply(player:get_look_dir(), range)),
 				true, def.liquids_pointable)
