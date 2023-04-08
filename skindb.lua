@@ -185,7 +185,7 @@ local function page(pagenum, per_page, on_complete)
 		for i = start - 1, 1, -1 do
 			local index = i + (pagenum - 1) * per_page
 			if skins[i].id > epidermis.skins[index].id then -- Deletion
-				epidermis.remove_skindb_skin(epidermis.skins[index])
+				epidermis.remove_skindb_skin(epidermis.skins[index].id)
 				add_skin(skins[i], index)
 			end
 		end
